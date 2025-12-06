@@ -1,7 +1,17 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
+
+
 const prisma = new PrismaClient();
+
+const getTimeLeft = (createdAt: Date, eta: Date) => {
+  const created = new Date(createdAt);
+  const etaTime = new Date(eta);
+  const diffMs = etaTime.getTime() - created.getTime();
+  return Math.round(diffMs / 60000); // convert ms → minutes
+};
+
 
 const addMinutes = (date: Date, minutes: number) => {
   return new Date(date.getTime() + minutes * 60000);
@@ -44,12 +54,18 @@ export const getOrders = async (req: Request, res: Response) => {
       }
     });
 
-    res.json(orders);
+    const enhanced = orders.map(order => ({
+      ...order,
+      timeLeftInMinutes: getTimeLeft(order.createdAt, order.eta)
+    }));
+
+    res.json(enhanced);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 export const getOrdersByCustomer = async (req: Request, res: Response) => {
   try {
@@ -63,7 +79,12 @@ export const getOrdersByCustomer = async (req: Request, res: Response) => {
       }
     });
 
-    res.json(orders);
+    const enhanced = orders.map(order => ({
+      ...order,
+      timeLeftInMinutes: getTimeLeft(order.createdAt, order.eta)
+    }));
+
+    res.json(enhanced);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -82,16 +103,22 @@ export const getOrdersByRestaurant = async (req: Request, res: Response) => {
       }
     });
 
-    res.json(orders);
+    const enhanced = orders.map(order => ({
+      ...order,
+      timeLeftInMinutes: getTimeLeft(order.createdAt, order.eta)
+    }));
+
+    res.json(enhanced);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
+
 export const getOrdersByTime = async (req: Request, res: Response) => {
   try {
-    const { date } = req.query; 
+    const { date } = req.query;
 
     if (!date) {
       return res.status(400).json({ message: "Provide ?date=YYYY-MM-DD" });
@@ -114,9 +141,15 @@ export const getOrdersByTime = async (req: Request, res: Response) => {
       }
     });
 
-    res.json(orders);
+    const enhanced = orders.map(order => ({
+      ...order,
+      timeLeftInMinutes: getTimeLeft(order.createdAt, order.eta)
+    }));
+
+    res.json(enhanced);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+

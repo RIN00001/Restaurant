@@ -24,7 +24,10 @@ export const createCustomer = async (req: Request, res: Response) => {
 
 export const getCustomers = async (req: Request, res: Response) => {
   try {
-    const customers = await prisma.customer.findMany();
+    const customers = await prisma.customer.findMany({
+      orderBy: { id: "asc" },
+    });
+
     res.json(customers);
   } catch (error) {
     console.error(error);

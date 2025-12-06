@@ -28,7 +28,10 @@ export const createRestaurant = async (req: Request, res: Response) => {
 
 export const getRestaurants = async (req: Request, res: Response) => {
   try {
-    const restaurants = await prisma.restaurant.findMany();
+    const restaurants = await prisma.restaurant.findMany({
+      orderBy: { id: "asc" },
+    });
+
     res.json(restaurants);
   } catch (error) {
     console.error(error);
